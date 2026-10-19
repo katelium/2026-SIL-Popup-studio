@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SIL Pop-Up Studio Finder</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f0f4ff;--card:#fff;--ink:#1a1a2e;--muted:#6b7090;
+  --pink:#ffb3c6;--mint:#b8f0d8;--sky:#b5d8ff;--lemon:#fff0a8;--lilac:#d9c8ff;--peach:#ffd3b0;
+  --line:#c9d3f0;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px);color-scheme:light}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Nunito',system-ui,sans-serif;min-height:100vh}
+.wrap{max-width:760px;margin:0 auto;padding:20px 16px 48px}
+h1{font-family:'Fredoka One','Nunito',sans-serif;font-weight:400;font-size:clamp(1.7rem,6vw,2.3rem);margin:8px 0 4px;text-align:center}
+.sub{text-align:center;color:var(--muted);margin:0 0 18px;font-weight:600}
+.panel{background:var(--card);border-radius:20px;padding:16px;box-shadow:0 6px 18px rgba(80,100,180,.12)}
+.search{position:relative}
+.search input{width:100%;font:700 1.05rem 'Nunito',sans-serif;padding:14px 44px 14px 16px;border:3px solid var(--sky);border-radius:14px;color:var(--ink);background:#fff;outline:none}
+.search input:focus{border-color:#7aa8f0}
+.clear{position:absolute;right:8px;top:50%;transform:translateY(-50%);border:0;background:var(--lilac);color:var(--ink);width:30px;height:30px;border-radius:50%;font-weight:800;cursor:pointer;display:none}
+.filters{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.filters .full{grid-column:1/-1}
+select{width:100%;font:700 .95rem 'Nunito',sans-serif;padding:11px 10px;border:3px solid var(--line);border-radius:12px;background:#fff;color:var(--ink)}
+.chips{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;align-items:center}
+.chip{font:800 .9rem 'Nunito',sans-serif;background:#fff;color:var(--ink);border:3px solid var(--lilac);border-radius:999px;padding:6px 16px;cursor:pointer;box-shadow:0 3px 0 var(--lilac)}
+.chip:active{transform:translateY(2px);box-shadow:0 1px 0 var(--lilac)}
+.chip.on{background:var(--lilac)}
+.reset{margin-left:auto;font:800 .85rem 'Nunito',sans-serif;background:none;border:0;color:#5a7bd0;cursor:pointer;text-decoration:underline}
+.count{margin:18px 4px 10px;font-weight:800;color:var(--muted)}
+.list{display:grid;gap:12px}
+.card{background:var(--card);border-radius:18px;padding:14px 16px;box-shadow:0 4px 12px rgba(80,100,180,.12);border-left:8px solid var(--sky)}
+.card.s2{border-left-color:var(--pink)}
+.name{font-family:'Fredoka One','Nunito',sans-serif;font-size:1.15rem;line-height:1.25;word-break:break-word}
+.meta{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
+.tag{font-weight:800;font-size:.78rem;border-radius:999px;padding:3px 11px;background:var(--sky)}
+.tag.lvl2{background:var(--pink)}
+.tag.cls{background:var(--mint)}
+.act{font-weight:800;font-size:1rem}
+.venue{display:inline-block;margin-top:6px;font-weight:800;font-size:.85rem;background:var(--lemon);border-radius:10px;padding:3px 10px}
+.time{margin-top:10px;background:#f6f8ff;border:2px dashed var(--line);border-radius:12px;padding:8px 12px;font-weight:700;font-size:.9rem;line-height:1.5}
+.time b{font-weight:800}
+.s2 .time{border-color:var(--pink)}
+mark{background:var(--lemon);color:inherit;border-radius:4px;padding:0 1px}
+.empty{background:var(--card);border-radius:18px;padding:28px 16px;text-align:center;color:var(--muted);font-weight:700;box-shadow:0 4px 12px rgba(80,100,180,.12)}
+.group{margin:18px 4px 8px;font-family:'Fredoka One','Nunito',sans-serif;font-size:1.05rem}
+.group small{font-family:'Nunito',sans-serif;font-weight:800;color:var(--muted);margin-left:6px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🎨 SIL Pop-Up Studio Finder</h1>
+  <p class="sub">Search by name, class or activity to find your studio</p>
+
+  <div class="panel">
+    <div class="search">
+      <input id="q" type="search" placeholder="Type a name, class or activity…" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Search">
+      <button class="clear" id="clr" aria-label="Clear search">✕</button>
+    </div>
+    <div class="filters">
+      <select id="cls" aria-label="Filter by class"><option value="">All classes</option></select>
+      <select id="act" aria-label="Filter by activity"><option value="">All activities</option></select>
+    </div>
+    <div class="chips">
+      <button class="chip on" data-l="">All</button>
+      <button class="chip" data-l="Sec 1">Sec 1</button>
+      <button class="chip" data-l="Sec 2">Sec 2</button>
+      <button class="reset" id="reset">Reset</button>
+    </div>
+  </div>
+
+  <div class="count" id="count"></div>
+  <div class="list" id="list"></div>
+</div>
+
+<script>
+const DATA = [{"n": "LIM JIA KAI", "c": "1 ENTERPRISE", "l": "Sec 1", "a": "CapCut 101: Easy Edits & Smooth Video", "v": "Spectrum 1"}, {"n": "MUHAMMAD ILHAM MIRZA BIN KHAIROL", "c": "2 CHARACTER", "l": "Sec 2", "a": "CapCut 101: Easy Edits & Smooth Video", "v": "Spectrum 1"}, {"n": "NUR ALYA SYAZWANIE BINTE MUHAMMAD AZMI", "c": "1 DYNAMIC", "l": "Sec 1", "a": "CapCut 101: Easy Edits & Smooth Video", "v": "Spectrum 1"}, {"n": "AARIZ BIN MUHAMMAD ZAHID", "c": "2 THINKING", "l": "Sec 2", "a": "CapCut 101: Easy Edits & Smooth Video", "v": "Spectrum 1"}, {"n": "RAYDEN TOH RUI ZE", "c": "1 DYNAMIC", "l": "Sec 1", "a": "CapCut 101: Easy Edits & Smooth Video", "v": "Spectrum 1"}, {"n": "DARIUS KAU ZI HAO", "c": "2 INTEGRITY", "l": "Sec 2", "a": "CapCut 101: Easy Edits & Smooth Video", "v": "Spectrum 1"}, {"n": "SEAH JA YEE", "c": "1 ENTERPRISE", "l": "Sec 1", "a": "CapCut 101: Easy Edits & Smooth Video", "v": "Spectrum 1"}, {"n": "TEE ZHU XUAN", "c": "2 ENTERPRISE", "l": "Sec 2", "a": "CapCut 101: Easy Edits & Smooth Video", "v": "Spectrum 1"}, {"n": "SHAHIR SHARIZAN BIN MUHAMMAD RIDUAN", "c": "1 ENTERPRISE", "l": "Sec 1", "a": "CapCut 101: Easy Edits & Smooth Video", "v": "Spectrum 1"}, {"n": "CHUA XIN ROU", "c": "1 DYNAMIC", "l": "Sec 1", "a": "Cardistry 101: The Classic Ribbon Spread", "v": "Music Room"}, {"n": "TRISTAN HO CHEE HYM", "c": "2 ENTERPRISE", "l": "Sec 2", "a": "Cardistry 101: The Classic Ribbon Spread", "v": "Music Room"}, {"n": "KOH JIA YI CLAIRE", "c": "1 DYNAMIC", "l": "Sec 1", "a": "Cardistry 101: The Classic Ribbon Spread", "v": "Music Room"}, {"n": "ELCUS KERK SHENG RONG", "c": "2 COMMITMENT", "l": "Sec 2", "a": "Cardistry 101: The Classic Ribbon Spread", "v": "Music Room"}, {"n": "WOO HONG XI", "c": "2 INTEGRITY", "l": "Sec 2", "a": "Cardistry 101: The Classic Ribbon Spread", "v": "Music Room"}, {"n": "CHEN SHICHEN", "c": "2 DYNAMIC", "l": "Sec 2", "a": "Cardistry 101: The Classic Ribbon Spread", "v": "Music Room"}, {"n": "HYDER ADYAN BIN MUHAMMAD HAMDAN", "c": "2 CHARACTER", "l": "Sec 2", "a": "Cardistry 101: The Classic Ribbon Spread", "v": "Music Room"}, {"n": "JOEL LAU ZHI YU", "c": "1 INTEGRITY", "l": "Sec 1", "a": "Coding: Build a Number Game in C#", "v": "Spectrum 1"}, {"n": "WANG XINYING, ZOE", "c": "2 THINKING", "l": "Sec 2", "a": "Coding: Build a Number Game in C#", "v": "Spectrum 1"}, {"n": "LINN PYAE KHANT", "c": "1 INTEGRITY", "l": "Sec 1", "a": "Coding: Build a Number Game in C#", "v": "Spectrum 1"}, {"n": "GAM ZHAN MING, IAN", "c": "2 CHARACTER", "l": "Sec 2", "a": "Coding: Build a Number Game in C#", "v": "Spectrum 1"}, {"n": "TAN YONG RUI", "c": "1 ENTERPRISE", "l": "Sec 1", "a": "Coding: Build a Number Game in C#", "v": "Spectrum 1"}, {"n": "NG SONG LAY JAVIER", "c": "2 THINKING", "l": "Sec 2", "a": "Coding: Build a Number Game in C#", "v": "Spectrum 1"}, {"n": "CHU EN XIAN ANSELM", "c": "1 ENTERPRISE", "l": "Sec 1", "a": "Coding: Build a Number Game in C#", "v": "Spectrum 1"}, {"n": "GO JIA HSUEN", "c": "2 ENTERPRISE", "l": "Sec 2", "a": "Coding: Build a Number Game in C#", "v": "Spectrum 1"}, {"n": "NG JIUN KHAI", "c": "1 DYNAMIC", "l": "Sec 1", "a": "Coding: Build a Number Game in C#", "v": "Spectrum 1"}, {"n": "RIFQI ASHAARI BIN SUPIAN", "c": "2 RESPECT", "l": "Sec 2", "a": "Coding: Build a Number Game in C#", "v": "Spectrum 1"}, {"n": "LEE YUE NING", "c": "1 INTEGRITY", "l": "Sec 1", "a": "Crack the Cube: Solve Your First Layer", "v": "Library"}, {"n": "KEE ZHAO LUN", "c": "2 CHARACTER", "l": "Sec 2", "a": "Crack the Cube: Solve Your First Layer", "v": "Library"}, {"n": "TRAVIS LOH JUN YOU", "c": "1 DYNAMIC", "l": "Sec 1", "a": "Crack the Cube: Solve Your First Layer", "v": "Library"}, {"n": "XIE YUFAN", "c": "2 RESPECT", "l": "Sec 2", "a": "Crack the Cube: Solve Your First Layer", "v": "Library"}, {"n": "TAN JUN KANG ANDRIC", "c": "1 DYNAMIC", "l": "Sec 1", "a": "Crack the Cube: Solve Your First Layer", "v": "Library"}, {"n": "AHMAD RAYYAN BIN AHMAD FAIZAL", "c": "2 DYNAMIC", "l": "Sec 2", "a": "Crack the Cube: Solve Your First Layer", "v": "Library"}, {"n": "DIANNE TEE RU XIN", "c": "1 DYNAMIC", "l": "Sec 1", "a": "Crack the Cube: Solve Your First Layer", "v": "Library"}, {"n": "NG YONG QUAN", "c": "2 INTEGRITY", "l": "Sec 2", "a": "Crack the Cube: Solve Your First Layer", "v": "Library"}, {"n": "MUHAMMAD NUH AMAN BIN MUHAMMAD AMIN", "c": "1 DYNAMIC", "l": "Sec 1", "a": "Crack the Cube: Solve Your First Layer", "v": "Library"}, {"n": "ZHAO XINRAN", "c": "2 DYNAMIC", "l": "Sec 2", "a": "Crack the Cube: Solve Your First Layer", "v": "Library"}, {"n": "NG YU TONG", "c": "1 RESPECT", "l": "Sec 1", "a": "Crocheting: Intro & Coaster Crafting", "v": "Library"}, {"n": "PANG JING YUN", "c": "2 CHARACTER", "l": "Sec 2", "a": "Crocheting: Intro & Coaster Crafting", "v": "Library"}, {"n": "NG KAI LE", "c": "1 RESPECT", "l": "Sec 1", "a": "Crocheting: Intro & Coaster Crafting", "v": "Library"}, {"n": "ALISSA LIN ZHIYAN", "c": "2 INTEGRITY", "l": "Sec 2", "a": "Crocheting: Intro & Coaster Crafting", "v": "Library"}, {"n": "NG WEI QIN, DENISE", "c": "1 INTEGRITY", "l": "Sec 1", "a": "Crocheting: Intro & Coaster Crafting", "v": "Library"}, {"n": "HO WAN YU", "c": "2 RESPECT", "l": "Sec 2", "a": "Crocheting: Intro & Coaster Crafting", "v": "Library"}, {"n": "NG XI WEI", "c": "1 DYNAMIC", "l": "Sec 1", "a": "Crocheting: Intro & Coaster Crafting", "v": "Library"}, {"n": "KATIE SIEW KAIXIN", "c": "2 THINKING", "l": "Sec 2", "a": "Crocheting: Intro & Coaster Crafting", "v": "Library"}, {"n": "SHARLENE CHEW ZHANG WEN", "c": "1 INTEGRITY", "l": "Sec 1", "a": "Crocheting: Intro & Coaster Crafting", "v": "Library"}, {"n": "ONG SI HUI", "c": "2 COMMITMENT", "l": "Sec 2", "a": "Crocheting: Intro & Coaster Crafting", "v": "Library"}, {"n": "SANI RAMADAN QURAISHI BIN ABDUL SHAHIB", "c": "1 THINKING", "l": "Sec 1", "a": "Musical Instruments: Intro to Guitar & Keyboard", "v": "Music Room"}, {"n": "CAYSTON CHING KAI YU", "c": "2 COMMITMENT", "l": "Sec 2", "a": "Musical Instruments: Intro to Guitar & Keyboard", "v": "Music Room"}, {"n": "PUTRI ALYA NATASHA BINTE AMRAN", "c": "1 COMMITMENT", "l": "Sec 1", "a": "Musical Instruments: Intro to Guitar & Keyboard", "v": "Music Room"}, {"n": "WANG YUXIANG KEVIN", "c": "2 DYNAMIC", "l": "Sec 2", "a": "Musical Instruments: Intro to Guitar & Keyboard", "v": "Music Room"}, {"n": "YASMIN NUR SOFIA BINTE IMRAN", "c": "1 THINKING", "l": "Sec 1", "a": "Musical Instruments: Intro to Guitar & Keyboard", "v": "Music Room"}, {"n": "SITI NUR'ALEESHA BINTE MUHAMMAD NOORSHAHID", "c": "2 COMMITMENT", "l": "Sec 2", "a": "Musical Instruments: Intro to Guitar & Keyboard", "v": "Music Room"}, {"n": "ELVIS ANG ZI JIE", "c": "1 INTEGRITY", "l": "Sec 1", "a": "Musical Instruments: Intro to Guitar & Keyboard", "v": "Music Room"}, {"n": "VINCE TAN JUN XUAN", "c": "2 DYNAMIC", "l": "Sec 2", "a": "Musical Instruments: Intro to Guitar & Keyboard", "v": "Music Room"}, {"n": "WONG SHI QING", "c": "1 ENTERPRISE", "l": "Sec 1", "a": "Musical Instruments: Intro to Guitar & Keyboard", "v": "Music Room"}, {"n": "KENZO TINOY GUANTERO", "c": "2 INTEGRITY", "l": "Sec 2", "a": "Musical Instruments: Intro to Guitar & Keyboard", "v": "Music Room"}, {"n": "TOH XIN YAN", "c": "1 COMMITMENT", "l": "Sec 1", "a": "Origami: Paper to Life – Animal Crafting", "v": "Library"}, {"n": "TAN YI XUN", "c": "2 COMMITMENT", "l": "Sec 2", "a": "Origami: Paper to Life – Animal Crafting", "v": "Library"}, {"n": "LU YIN HENG", "c": "1 ENTERPRISE", "l": "Sec 1", "a": "Origami: Paper to Life – Animal Crafting", "v": "Library"}, {"n": "CHEW ZI HAN", "c": "2 THINKING", "l": "Sec 2", "a": "Origami: Paper to Life – Animal Crafting", "v": "Library"}, {"n": "ONG BOON ENG", "c": "1 DYNAMIC", "l": "Sec 1", "a": "Origami: Paper to Life – Animal Crafting", "v": "Library"}, {"n": "JEVIN SEE KAI SHENG", "c": "2 ENTERPRISE", "l": "Sec 2", "a": "Origami: Paper to Life – Animal Crafting", "v": "Library"}, {"n": "CHEN SHI YING, KEVIONNA", "c": "1 ENTERPRISE", "l": "Sec 1", "a": "Origami: Paper to Life – Animal Crafting", "v": "Library"}, {"n": "HARIS RAYYAN BIN MUHAMMAD HASHIK", "c": "2 COMMITMENT", "l": "Sec 2", "a": "Origami: Paper to Life – Animal Crafting", "v": "Library"}, {"n": "LIEW ZI QING", "c": "2 ENTERPRISE", "l": "Sec 2", "a": "Origami: Paper to Life – Animal Crafting", "v": "Library"}, {"n": "CHIONG HWEE KIAT", "c": "1 COMMITMENT", "l": "Sec 1", "a": "Roblox Studio: Building Basics", "v": "Spectrum 1"}, {"n": "LEE MING JIN", "c": "2 ENTERPRISE", "l": "Sec 2", "a": "Roblox Studio: Building Basics", "v": "Spectrum 1"}, {"n": "GUO MINGRUI", "c": "1 THINKING", "l": "Sec 1", "a": "Roblox Studio: Building Basics", "v": "Spectrum 1"}, {"n": "LEROY ONG KEE HONG", "c": "2 INTEGRITY", "l": "Sec 2", "a": "Roblox Studio: Building Basics", "v": "Spectrum 1"}, {"n": "MUHAMMAD MIKHAIL AZKA BIN MUHAMMAD YUSNUL", "c": "1 DYNAMIC", "l": "Sec 1", "a": "Roblox Studio: Building Basics", "v": "Spectrum 1"}, {"n": "GABRIEL LEE NAY THAR", "c": "2 CHARACTER", "l": "Sec 2", "a": "Roblox Studio: Building Basics", "v": "Spectrum 1"}, {"n": "NUR SULAIMAN BIN FAZLY", "c": "1 DYNAMIC", "l": "Sec 1", "a": "Roblox Studio: Building Basics", "v": "Spectrum 1"}, {"n": "XU ZIHAO", "c": "2 RESPECT", "l": "Sec 2", "a": "Roblox Studio: Building Basics", "v": "Spectrum 1"}, {"n": "RAZIN ZUHAIR BIN ROSSLE", "c": "1 INTEGRITY", "l": "Sec 1", "a": "Roblox Studio: Building Basics", "v": "Spectrum 1"}, {"n": "MUHAMMAD HASHIM BIN HAJA MAIDEEN", "c": "2 CHARACTER", "l": "Sec 2", "a": "Roblox Studio: Building Basics", "v": "Spectrum 1"}, {"n": "MUHAMMAD RAIHAN BIN MOHAMED HANIS", "c": "1 ENTERPRISE", "l": "Sec 1", "a": "Sketchbook App: Intro, Digital Colouring & Shading", "v": "Spectrum 2"}, {"n": "TAN XUAN HAN", "c": "2 INTEGRITY", "l": "Sec 2", "a": "Sketchbook App: Intro, Digital Colouring & Shading", "v": "Spectrum 2"}, {"n": "LAU KAR SING", "c": "1 INTEGRITY", "l": "Sec 1", "a": "Sketchbook App: Intro, Digital Colouring & Shading", "v": "Spectrum 2"}, {"n": "KANE YANG DAE JOON", "c": "2 THINKING", "l": "Sec 2", "a": "Sketchbook App: Intro, Digital Colouring & Shading", "v": "Spectrum 2"}, {"n": "RAYHAAN IRFAN BARGIR", "c": "1 ENTERPRISE", "l": "Sec 1", "a": "Sketchbook App: Intro, Digital Colouring & Shading", "v": "Spectrum 2"}, {"n": "TEOH CHIA BAO", "c": "2 ENTERPRISE", "l": "Sec 2", "a": "Sketchbook App: Intro, Digital Colouring & Shading", "v": "Spectrum 2"}, {"n": "HUSNA AZ-ZAHRA BINTE MOHAMED FAIZ", "c": "1 DYNAMIC", "l": "Sec 1", "a": "Sketchbook App: Intro, Digital Colouring & Shading", "v": "Spectrum 2"}, {"n": "IMAN DHANIYAH BINTE TAUFID", "c": "2 ENTERPRISE", "l": "Sec 2", "a": "Sketchbook App: Intro, Digital Colouring & Shading", "v": "Spectrum 2"}, {"n": "LOW ZI YU ZOEY", "c": "1 DYNAMIC", "l": "Sec 1", "a": "Sketchbook App: Intro, Digital Colouring & Shading", "v": "Spectrum 2"}, {"n": "MUHAMMAD ALFYAN QUSYAIRI BIN MUHAMMAD TARMIMI", "c": "2 COMMITMENT", "l": "Sec 2", "a": "Sketchbook App: Intro, Digital Colouring & Shading", "v": "Spectrum 2"}, {"n": "MARYAM BINTE ALI", "c": "1 DYNAMIC", "l": "Sec 1", "a": "Speak Vietnamese: Your First 5-Minute Intro", "v": "Music Room"}, {"n": "JERVOIS LIAN HONGLE", "c": "2 INTEGRITY", "l": "Sec 2", "a": "Speak Vietnamese: Your First 5-Minute Intro", "v": "Music Room"}, {"n": "SUN SHENGFENG", "c": "1 THINKING", "l": "Sec 1", "a": "Speak Vietnamese: Your First 5-Minute Intro", "v": "Music Room"}, {"n": "LOW SHI XUAN", "c": "2 RESPECT", "l": "Sec 2", "a": "Speak Vietnamese: Your First 5-Minute Intro", "v": "Music Room"}, {"n": "MIKAYLA ZAHRA D/O SURESH", "c": "1 INTEGRITY", "l": "Sec 1", "a": "Speak Vietnamese: Your First 5-Minute Intro", "v": "Music Room"}, {"n": "TAY KAI XIN, KYLENE", "c": "2 DYNAMIC", "l": "Sec 2", "a": "Speak Vietnamese: Your First 5-Minute Intro", "v": "Music Room"}, {"n": "LEW JOO LE", "c": "1 ENTERPRISE", "l": "Sec 1", "a": "Speak Vietnamese: Your First 5-Minute Intro", "v": "Music Room"}, {"n": "LUCAS GAN SHI EN", "c": "2 THINKING", "l": "Sec 2", "a": "Speak Vietnamese: Your First 5-Minute Intro", "v": "Music Room"}, {"n": "TAN EN QI", "c": "1 INTEGRITY", "l": "Sec 1", "a": "Speak Vietnamese: Your First 5-Minute Intro", "v": "Music Room"}, {"n": "THOMAS LING JUN XIANG", "c": "2 INTEGRITY", "l": "Sec 2", "a": "Speak Vietnamese: Your First 5-Minute Intro", "v": "Music Room"}, {"n": "SUMAYYAH NUR ATHIRAH BEGUM BINTI FARID KHAN", "c": "1 DYNAMIC", "l": "Sec 1", "a": "ibis Paint: Character Designing", "v": "Spectrum 2"}, {"n": "NUR SYA'IRAH BINTE MOHAMED ISMAIL", "c": "2 RESPECT", "l": "Sec 2", "a": "ibis Paint: Character Designing", "v": "Spectrum 2"}, {"n": "KARALYNN ONG SHI QI", "c": "1 ENTERPRISE", "l": "Sec 1", "a": "ibis Paint: Character Designing", "v": "Spectrum 2"}, {"n": "AKMAL ZIKRY BIN HISHAM", "c": "2 RESPECT", "l": "Sec 2", "a": "ibis Paint: Character Designing", "v": "Spectrum 2"}, {"n": "SOO KAI MING", "c": "1 ENTERPRISE", "l": "Sec 1", "a": "ibis Paint: Character Designing", "v": "Spectrum 2"}, {"n": "LIM ZI WEI", "c": "2 COMMITMENT", "l": "Sec 2", "a": "ibis Paint: Character Designing", "v": "Spectrum 2"}, {"n": "CHENG CHU YIN", "c": "1 DYNAMIC", "l": "Sec 1", "a": "ibis Paint: Character Designing", "v": "Spectrum 2"}, {"n": "UMAIRAH NUR FAQIHAH BINTE AHMAD IZWAN", "c": "2 DYNAMIC", "l": "Sec 2", "a": "ibis Paint: Character Designing", "v": "Spectrum 2"}, {"n": "DAI YUECHEN", "c": "2 THINKING", "l": "Sec 2", "a": "ibis Paint: Character Designing", "v": "Spectrum 2"}, {"n": "YONG BIN XIN", "c": "1 DYNAMIC", "l": "Sec 1", "a": "ibis Paint: Drawing Fundamentals", "v": "Spectrum 2"}, {"n": "DHIYAZ SAFWANA", "c": "2 INTEGRITY", "l": "Sec 2", "a": "ibis Paint: Drawing Fundamentals", "v": "Spectrum 2"}, {"n": "LEE GUO HAO BENJAMIN", "c": "1 ENTERPRISE", "l": "Sec 1", "a": "ibis Paint: Drawing Fundamentals", "v": "Spectrum 2"}, {"n": "HURUN AIN BINTI MUHAMMAD YAZID", "c": "2 ENTERPRISE", "l": "Sec 2", "a": "ibis Paint: Drawing Fundamentals", "v": "Spectrum 2"}, {"n": "MUHAMMAD AARON RIZQI BIN MUHAMMAD RAMDZAN", "c": "1 DYNAMIC", "l": "Sec 1", "a": "ibis Paint: Drawing Fundamentals", "v": "Spectrum 2"}, {"n": "CHLOE TAN ZHI XUAN", "c": "2 CHARACTER", "l": "Sec 2", "a": "ibis Paint: Drawing Fundamentals", "v": "Spectrum 2"}, {"n": "LESLEY LOW YU QING", "c": "1 DYNAMIC", "l": "Sec 1", "a": "ibis Paint: Drawing Fundamentals", "v": "Spectrum 2"}, {"n": "FARAH HAZIQAH BINTE HEIZER", "c": "2 DYNAMIC", "l": "Sec 2", "a": "ibis Paint: Drawing Fundamentals", "v": "Spectrum 2"}, {"n": "OOI SHUEN ENN", "c": "2 RESPECT", "l": "Sec 2", "a": "ibis Paint: Drawing Fundamentals", "v": "Spectrum 2"}, {"n": "ER ZI QING, ZOE", "c": "1 THINKING", "l": "Sec 1", "a": "ibis Paint: Intro & Glowing Digital Art", "v": "Spectrum 2"}, {"n": "JIANG JIAYI", "c": "2 THINKING", "l": "Sec 2", "a": "ibis Paint: Intro & Glowing Digital Art", "v": "Spectrum 2"}, {"n": "MEGAN DAN XI EN", "c": "1 INTEGRITY", "l": "Sec 1", "a": "ibis Paint: Intro & Glowing Digital Art", "v": "Spectrum 2"}, {"n": "MUHAMMAD HYEDAR GHOFFRAN BIN SYAHMI NAZRI", "c": "2 CHARACTER", "l": "Sec 2", "a": "ibis Paint: Intro & Glowing Digital Art", "v": "Spectrum 2"}, {"n": "RHAMAN FATIMAH NUR AMREEN ALVAREZ", "c": "1 INTEGRITY", "l": "Sec 1", "a": "ibis Paint: Intro & Glowing Digital Art", "v": "Spectrum 2"}, {"n": "PHOEBE NG XIN YAN", "c": "2 RESPECT", "l": "Sec 2", "a": "ibis Paint: Intro & Glowing Digital Art", "v": "Spectrum 2"}, {"n": "LAI CHEN XUAN", "c": "1 ENTERPRISE", "l": "Sec 1", "a": "ibis Paint: Intro & Glowing Digital Art", "v": "Spectrum 2"}, {"n": "RAEESA ARIANA BINTE RAMDAM", "c": "2 COMMITMENT", "l": "Sec 2", "a": "ibis Paint: Intro & Glowing Digital Art", "v": "Spectrum 2"}, {"n": "KOY JIA QI", "c": "1 DYNAMIC", "l": "Sec 1", "a": "ibis Paint: Intro & Glowing Digital Art", "v": "Spectrum 2"}, {"n": "KHOO ZI YU JASMINE", "c": "2 RESPECT", "l": "Sec 2", "a": "ibis Paint: Intro & Glowing Digital Art", "v": "Spectrum 2"}];
+const norm = s => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9\s]/g,' ').replace(/\s+/g,' ').trim();
+DATA.forEach(d => d._k = norm([d.n, d.c, d.a, d.v, d.l].join(' ')));
+DATA.sort((a,b)=>a.n.localeCompare(b.n));
+
+const $ = id => document.getElementById(id);
+const TIMES = {
+  'Sec 1': {report:'11:45am', prog:'11:45am – 12:30pm'},
+  'Sec 2': {report:'11:00am', prog:'11:00am – 11:45am'}
+};
+let level = '';
+const classes = [...new Set(DATA.map(d=>d.c))].sort((a,b)=>a.localeCompare(b,undefined,{numeric:true}));
+const acts = [...new Set(DATA.map(d=>d.a))].sort((a,b)=>a.localeCompare(b));
+classes.forEach(c => $('cls').add(new Option(c,c)));
+acts.forEach(a => $('act').add(new Option(a,a)));
+
+const esc = s => s.replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function hl(text, toks){
+  let out = esc(text);
+  toks.filter(t=>t.length>1).forEach(t=>{
+    out = out.replace(new RegExp('('+t.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')(?![^<]*>)','ig'),'<mark>$1</mark>');
+  });
+  return out;
+}
+function render(){
+  const raw = $('q').value;
+  $('clr').style.display = raw ? 'block' : 'none';
+  const toks = norm(raw).split(' ').filter(Boolean);
+  const c = $('cls').value, a = $('act').value;
+  const res = DATA.filter(d =>
+    (!level || d.l===level) && (!c || d.c===c) && (!a || d.a===a) &&
+    toks.every(t => d._k.includes(t)));
+  const filtering = raw || c || a || level;
+  $('count').textContent = res.length + (res.length===1?' student':' students') + (filtering?' found':' in total');
+  const list = $('list');
+  if(!res.length){
+    list.innerHTML = '<div class="empty">No matches 🔍<br>Check the spelling, or try fewer words (e.g. just a surname).</div>';
+    return;
+  }
+  list.innerHTML = res.map(d => `
+    <div class="card ${d.l==='Sec 2'?'s2':''}">
+      <div class="name">${hl(d.n,toks)}</div>
+      <div class="meta"><span class="tag ${d.l==='Sec 2'?'lvl2':''}">${d.l}</span><span class="tag cls">${hl(d.c,toks)}</span></div>
+      <div class="act">🎯 ${hl(d.a,toks)}</div>
+      ${d.v?`<span class="venue">📍 ${hl(d.v,toks)}</span>`:''}
+      <div class="time">⏰ <b>Report to venue:</b> ${TIMES[d.l].report}<br>🕘 <b>Programme:</b> ${TIMES[d.l].prog}</div>
+    </div>`).join('');
+}
+['input'].forEach(e=>$('q').addEventListener(e,render));
+$('cls').addEventListener('change',render);
+$('act').addEventListener('change',render);
+$('clr').onclick = () => {$('q').value='';render();$('q').focus()};
+document.querySelectorAll('.chip').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('.chip').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on'); level=b.dataset.l; render();
+});
+$('reset').onclick = () => {
+  $('q').value='';$('cls').value='';$('act').value='';level='';
+  document.querySelectorAll('.chip').forEach(x=>x.classList.toggle('on',x.dataset.l===''));
+  render();
+};
+render();
+</script>
+</body>
+</html>
